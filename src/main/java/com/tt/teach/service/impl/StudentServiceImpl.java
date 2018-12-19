@@ -6,6 +6,7 @@ import com.tt.teach.service.StudentService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @Service
 public class StudentServiceImpl implements StudentService{
@@ -14,5 +15,9 @@ public class StudentServiceImpl implements StudentService{
 
     public Student doLogin(Student student) {
         return studentDao.doLogin(student);
+    }
+
+    public List<Student> getStudentList() {
+        return studentDao.getStudentList();
     }
 }
