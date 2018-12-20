@@ -1,36 +1,51 @@
-<!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+﻿<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
-    <title>信息管理</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>科目查询</title>
     <!-- Bootstrap必须使用的CSS -->
     <link th:href="@{/static/css/bootstrap.min.css}" rel="stylesheet">
     <!-- Bootstrap中table的插件的css -->
     <link th:href="@{/static/css/bootstrap-table.css}" rel="stylesheet">
     <!-- 小图标的css(非必须的) -->
-    <!--<link th:href="@{/static/css/font-awesome.min.css}" rel="stylesheet">-->
+    <link th:href="@{/static/css/font-awesome.min.css}" rel="stylesheet">
     <!--自己使用的css放到后面-->
     <link th:href="@{/static/css/style.css}" rel="stylesheet">
     <!--配置IE版本兼容，其中解决兼容性的js可以放到 页面内容的前面 -->
     <link th:href="@{/static/css/ie10-viewport-bug-workaround.css}" rel="stylesheet">
     <script th:src="@{/static/js/lib/ie8-responsive-file-warning.js}"></script>
     <script th:src="@{/static/js/lib/ie-emulation-modes-warning.js}"></script>
+    <script th:src="@{/static/js/filter.js}"></script>
+    <script th:src="@{/static/My97DatePicker/WdatePicker.js}"></script>
+
     <!-- HTML5 shim 和 Respond.js 是为了让 IE8 支持 HTML5 元素和媒体查询（media queries）功能 -->
     <!-- 警告：通过 file:// 协议（就是直接将 html 页面拖拽到浏览器中）访问页面时 Respond.js 不起作用 -->
     <!--[if lt IE 9]>
     <script th:src="@{/static/js/lib/html5shiv.min.js}"></script>
     <script th:src="@{/static/js/lib/respond.min.js}"></script>
     <![endif]-->
+
 </head>
 <body>
-    <!--1.前端提供的table，一会将使用bootstrap框架进行ajax异步请求，将数据渲染到table中-->
-    <table id="table_stu" data-toggle="table" data-height="400">
-
+    <!--1.工具类-->
+    <div class="placeholder hd">
+            <span class="setIcon pull-right">
+                        <button class=" btn btn-primary " data-toggle='modal' data-target='#myModal' type="button" id="add"><span class="fa fa-add"></span>&nbsp;成绩录入</button>
+                        <button class=" btn btn-primary " type="button" id="save"><span class="fa fa-save"></span>&nbsp;保存</button>
+                        <button class=" btn btn-primary " type="button" id="edit"><span class="fa fa-edit"></span>&nbsp;编辑</button>
+                        <button class=" btn btn-primary " type="button" id="cancel"><span class="fa fa-arrow-left"></span>&nbsp;取消编辑</button>
+                        <button class=" btn btn-primary " type="button" id="del"><span class="fa fa-remove"></span>&nbsp;删除</button>
+            </span>
+    </div>
+    <!--2.空的Table-->
+    <table id="table_result" data-height="360" data-toggle="table">
     </table>
-    <!--2.前端提供的弹出框，负责编辑信息的显示-->
+    <!--3.隐藏的弹出框-->
     <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -39,33 +54,31 @@
                         &times;
                     </button>
                     <h4 class="modal-title" id="myModalLabel">
-                        编辑
+                        添加
                     </h4>
                 </div>
                 <div class="modal-body">
-
-                    <form name="placeOrder" method="POST" action="/stu/updateStudent">
+                    <form name="placeResult" >
                         <input type="hidden" value="" id="bhId">
                         <div class="form-group">
-                            <label for="stuNo">学号</label>
-                            <input type="text" class="form-control" id="stuNo" name="stuNo" placeholder="学号" required readonly>
+                            <label for="studentNo">学号</label>
+                            <span id="stuNo"></span>
+                            <input type="text" class="form-control" id="studentNo" placeholder="学号" required >
                         </div>
                         <div class="form-group">
-                            <label for="stuName">姓名</label>
-                            <input type="text" class="form-control" id="stuName" name="stuName" placeholder="姓名" required>
+                            <label for="subjectNo">课程编号</label>
+                            <input type="text" class="form-control" id="subjectNo" placeholder="课程编号" required >
                         </div>
                         <div class="form-group">
-                            <label for="stuPwd">密码</label>
-                            <input type="text" class="form-control" id="stuPwd" name="stuPwd" placeholder="密码" required>
+                            <label for="examDate">考试时间</label>
+                           <input type="text" class="form-control" id="examDate" placeholder="考试时间" required >
                         </div>
                         <div class="form-group">
-                            <label for="stuPhone">电话</label>
-                            <input type="text" class="form-control" id="stuPhone" name="stuPhone" placeholder="电话" required>
+                            <label for="studentResult">学生成绩</label>
+                            <input type="text" class="form-control" id="studentResult" placeholder="学生成绩" required>
                         </div>
-
-                        <button type="submit" class="btn btn-primary" >提交</button>
+                        <button type="button" class="btn btn-primary" id="addResult">录入</button>
                     </form>
-
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">关闭
@@ -74,9 +87,8 @@
             </div>
         </div>
     </div>
-
-
 </body>
+
 <!-- 不是兼容性的js放到页面内容后面 -->
 <!--所有的前段页面，肯定要用jquery放在第一行  -->
 <script th:src="@{/static/js/lib/jquery-1.12.4.js}"></script>
@@ -89,39 +101,13 @@
 <script th:src="@{/static/js/lib/holder.min.js}"></script>
 <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
 <script th:src="@{/static/js/lib/ie10-viewport-bug-workaround.js}"></script>
+<!--1.使用bootstrapTable将json数据渲染到页面-->
 <script>
-    //3.前端提供的绑定事件myselfEvents
-    window.myselfEvents = {
-        "click .edit":function(e,value,row,index){
-            $("#myModal").modal("show");
-            $("#stuNo").val(row.studentNo);
-            $("#stuName").val(row.studentName);
-            $("#stuPwd").val(row.loginPwd);
-            $("#stuPhone").val(row.phone);
-        },
-        "click .delete":function(e,value,row,index) {
-            var stuNo = row.studentNo;
-            var isOk = confirm("您确定要删除吗？");
-            if(isOk){
-                $.ajax({
-                    url:"/stu/deleteStudent/"+stuNo,
-                    type:"DELETE",
-                    success:function (data) {
-                        console.log(data)
-                        alert(data.msg);
-                        //重新渲染一下页面
-                        window.location.reload();
-                    }
-                })
-            }
-        }
-    }
-
-    function findStuFn() {
-        $("#table_stu").bootstrapTable({
-            url:"/stu/getStudentList", //请求的URL地址
-            type:"GET",                //请求类型
-            dataType:"json",           //期望的，返回数据类型
+    function findResFn() {
+        $("#table_result").bootstrapTable({
+            url:"/res/getResultList",
+            type:"GET",
+            dataType:"json",
             pagination:true,           //是否进行分页
             search:true,                //是否有搜索框
             showRefresh:true,            //是否有刷新按钮
@@ -129,77 +115,56 @@
             pageList:[1,2,3,4,5],         //每页显示数据的选择
             columns:[
                 {
-                    field:"studentNo",
-                    title:"学号",
+                    field:"resultNo",
+                    title:"成绩编号",
                     align:"center",
                     valign:"middle",
                     searchable:true
-                },
-                {
+                },{
                     field:"studentName",
                     title:"姓名",
                     align:"center",
                     valign:"middle",
                     searchable:true
-                },
-                {
-                    field:"loginPwd",
-                    title:"密码",
+                },{
+                    field:"subjectName",
+                    title:"科目",
                     align:"center",
                     valign:"middle",
                     searchable:true
-                },
-                {
-                    field:"sex",
-                    title:"性别",
+                },{
+                    field:"examDate",
+                    title:"考试时间",
                     align:"center",
                     valign:"middle",
                     searchable:true
-                },
-                {
-                    field:"gradeName",
-                    title:"年级",
+                },{
+                    field:"studentResult",
+                    title:"成绩",
                     align:"center",
                     valign:"middle",
                     searchable:true
-                },
-                {
-                    field:"phone",
-                    title:"电话",
-                    align:"center",
-                    valign:"middle",
-                    searchable:true
-                },
-                {
-                    field:"bornDate",
-                    title:"出生日期",
-                    align:"center",
-                    valign:"middle",
-                    searchable:true
-                },
-                {
-                    field:"#",
-                    title:"操作",
-                    align:"center",
-                    valign:"middle",
-                    formatter:delEdit,
-                    events:myselfEvents
                 }
             ]
         })
     }
 
-    findStuFn();
-
-
-
-       
-            //4.前端提供编辑按钮两个，需要加如自己的绑定事件myselfEvents
-            function delEdit(value,row,index){
-                return [
-                    "<a class='btn btn-primary btn-sm edit' data-target='#myModal'>编辑</a> " +
-                    "<a class='btn btn-primary btn-sm delete'>删除</a>"].join('');
-        }
+    findResFn();
 
 </script>
+<!--2.关于表格点击每一行tr背景颜色的变化。添加了一个class——》tr_new，后面的操作全是通过这个class取获取主键进行操作的-->
+<script>
+   
+</script>
+
+<!--3.对添加，保存，编辑，取消编辑，删除，全部删除进行对应的操作-->
+<script>
+   
+</script>
+<script>
+
+</script>
+<style type="text/css">
+   
+</style>
 </html>
